@@ -1,9 +1,24 @@
-:root {
-    --bg-color: #030304; /* True void black */
+/* Dynamic Themes */
+:root[data-theme="dark"] {
+    --bg-color: #030304;
     --text-main: #d4d4d8;
     --text-muted: #6b6b75;
-    --accent: #d4af37; /* Pale cosmic gold */
+    --text-heading: #ffffff;
+    --accent: #d4af37;
     --glow-color: rgba(212, 175, 55, 0.08);
+    --pill-bg: rgba(255, 255, 255, 0.05);
+    --pill-border: rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme="light"] {
+    --bg-color: #f7f7f9;
+    --text-main: #333338;
+    --text-muted: #8e8e96;
+    --text-heading: #111112;
+    --accent: #b8912a;
+    --glow-color: rgba(184, 145, 42, 0.05);
+    --pill-bg: rgba(0, 0, 0, 0.04);
+    --pill-border: rgba(0, 0, 0, 0.1);
 }
 
 body {
@@ -12,14 +27,42 @@ body {
     background-color: var(--bg-color);
     color: var(--text-main);
     font-family: 'Lora', serif;
-    line-height: 2.2; /* Hypnotic, slow reading pace */
-    font-size: 1.2rem;
+    line-height: clamp(1.8, 2vw, 2.2);
+    font-size: clamp(1.05rem, 1.5vw, 1.3rem);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    transition: background-color 0.8s ease, color 0.8s ease;
 }
 
-/* 1. Cinematic Film Grain Overlay */
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: clamp(15px, 3vw, 30px);
+    right: clamp(15px, 3vw, 30px);
+    background: var(--pill-bg);
+    border: 1px solid var(--pill-border);
+    color: var(--text-main);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 200;
+    backdrop-filter: blur(5px);
+    transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    background: var(--glow-color);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Cinematic Grain */
 .grain {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -27,145 +70,213 @@ body {
     z-index: 50;
     opacity: 0.04;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
 }
 
-/* 2. The Observer Glow (Follows Mouse) */
+/* The Observer Glow */
 #glow {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 600px;
-    height: 600px;
+    top: 50%; left: 50%;
+    width: 40vw; height: 40vw;
+    min-width: 400px; min-height: 400px;
     background: radial-gradient(circle, var(--glow-color) 0%, transparent 60%);
     border-radius: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 0;
-    transition: width 0.3s, height 0.3s;
+    transition: background 0.8s ease;
 }
 
-/* Reading Progress */
+@media (pointer: coarse) {
+    #glow { display: none; }
+}
+
+/* Interactive Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: scale(0);
+    animation: ripple-anim 0.6s linear;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 9999;
+}
+
+@keyframes ripple-anim {
+    to { transform: scale(4); opacity: 0; }
+}
+
+/* Progress Bar */
 .progress-container {
     position: fixed;
     top: 0; z-index: 100;
-    width: 100%; height: 1px;
+    width: 100%; height: 2px;
     background: transparent;
 }
 .progress-bar {
-    height: 1px;
+    height: 2px;
     background: var(--accent);
     width: 0%;
-    box-shadow: 0 0 8px var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    transition: width 0.1s ease-out;
 }
 
 /* Typography & Layout */
 header {
     text-align: center;
-    padding: 25vh 20px 20vh;
+    padding: clamp(15vh, 20vh, 25vh) 20px clamp(10vh, 15vh, 20vh);
     position: relative;
     z-index: 10;
 }
 
 h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 4rem;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
     font-weight: 400;
-    color: #ffffff;
+    color: var(--text-heading);
     margin: 0 0 20px 0;
     line-height: 1.1;
     letter-spacing: -1px;
+    transition: color 0.8s ease;
 }
 
 .subtitle {
     font-family: 'Lora', serif;
-    font-size: 1.15rem;
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
     font-style: italic;
     color: var(--accent);
     letter-spacing: 2px;
     margin: 0;
-    opacity: 0.8;
 }
 
 main {
-    max-width: 620px; /* Narrower width pulls the eyes in */
+    width: 100%;
+    max-width: 650px;
     margin: 0 auto;
-    padding: 0 25px;
+    padding: 0 clamp(20px, 5vw, 40px);
     position: relative;
     z-index: 10;
+    box-sizing: border-box;
 }
 
-section {
-    margin-bottom: 15vh;
-}
+section { margin-bottom: clamp(10vh, 15vh, 20vh); }
 
 h2 {
     font-family: 'Playfair Display', serif;
     font-weight: 400;
-    color: #ffffff;
-    font-size: 2.2rem;
+    color: var(--text-heading);
+    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
     margin-bottom: 40px;
     text-align: center;
-    letter-spacing: 0.5px;
+    transition: color 0.8s ease;
 }
 
-p {
-    margin-bottom: 35px;
-    color: var(--text-main);
-}
+p { margin-bottom: clamp(25px, 4vw, 40px); }
 
 /* Editorial Drop Cap */
 h2 + p::first-letter {
     font-family: 'Playfair Display', serif;
-    font-size: 3.5rem;
+    font-size: clamp(2.8rem, 5vw, 3.8rem);
     float: left;
-    margin-top: -10px;
-    margin-right: 12px;
+    margin-top: -8px; margin-right: 12px;
     color: var(--accent);
     line-height: 1;
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .intro p {
-    font-size: 1.4rem;
-    color: #eaeaea;
+    font-size: clamp(1.2rem, 2vw, 1.45rem);
+    color: var(--text-heading);
     text-align: center;
-    line-height: 2;
+    transition: color 0.8s ease;
 }
 
+/* Footer & Socials */
 footer {
     text-align: center;
     padding: 5vh 20px 15vh;
-    color: var(--accent);
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.4rem;
     position: relative;
     z-index: 10;
 }
 
-/* 3. Cascading Reveal Animations */
+.tagline {
+    color: var(--accent);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.2rem, 2vw, 1.4rem);
+    margin-bottom: 25px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+.social-links a {
+    color: var(--text-muted);
+    transition: color 0.4s ease, transform 0.4s ease;
+    display: inline-block;
+}
+
+.social-links svg {
+    width: 24px;
+    height: 24px;
+}
+
+.social-links a:hover {
+    color: var(--accent);
+    transform: translateY(-4px);
+}
+
+/* Engineering / DevSecOps Branding */
+.tech-branding {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.tech-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--pill-bg);
+    border: 1px solid var(--pill-border);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.tech-pill svg {
+    width: 14px;
+    height: 14px;
+    color: var(--accent);
+}
+
+.tech-pill:hover {
+    background: var(--glow-color);
+    border-color: var(--accent);
+    color: var(--text-main);
+    transform: translateY(-2px);
+}
+
+/* Reveal Animations */
 .fade-item {
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 1.5s cubic-bezier(0.25, 1, 0.5, 1), transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
-
-.fade-item.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Staggered delay for paragraphs in the same section */
+.fade-item.visible { opacity: 1; transform: translateY(0); }
 .fade-item.visible:nth-child(1) { transition-delay: 0.1s; }
 .fade-item.visible:nth-child(2) { transition-delay: 0.3s; }
 .fade-item.visible:nth-child(3) { transition-delay: 0.5s; }
 .fade-item.visible:nth-child(4) { transition-delay: 0.7s; }
-
-/* Mobile */
-@media (max-width: 768px) {
-    h1 { font-size: 2.8rem; }
-    h2 { font-size: 1.8rem; }
-    .intro p { font-size: 1.25rem; }
-    body { font-size: 1.1rem; }
-    #glow { display: none; /* Disable cursor glow on touch screens */ }
-}
