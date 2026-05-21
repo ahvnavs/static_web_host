@@ -34,7 +34,7 @@ resource "aws_s3_object" "s3_object" {
 
 resource "aws_s3_bucket_policy" "s3_policy" {
     bucket = aws_s3_bucket.bucket_s3.id
-    policy = jsondecode({
+    policy = jsonencode({
         Version = "2012-10-17"
         Statement = [
             {
@@ -44,7 +44,7 @@ resource "aws_s3_bucket_policy" "s3_policy" {
                 }
                 Action = "s3:GetObject"
                 Resource = "${aws_s3_bucket.bucket_s3.arn}/*"
-                condition = {
+                Condition = {
                     StringEquals = {
                         "AWS:SourceArn" = aws_cloudfront_distribution.edge_distro.arn
                     }
@@ -90,6 +90,12 @@ resource "aws_cloudfront_distribution" "edge_distro" {
         viewer_protocol_policy = "redirect-to-https"
         allowed_methods = ["GET","HEAD"]
         cached_methods = ["GET","HEAD"]
+        forwarded_values {
+            query_string = false
+            cookies {
+                forward = "none"
+            }
+        }
     }
     restrictions {
         geo_restriction {
