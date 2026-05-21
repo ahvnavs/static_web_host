@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "bucket_s3" {
-    bucket = ""
+    bucket = "host-static-web-app-s3-cloudfront"
     provider = aws
     region = var.default_region
     tags = var.tags
