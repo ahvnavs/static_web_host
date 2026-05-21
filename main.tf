@@ -13,6 +13,9 @@ resource "aws_s3_bucket_public_access_block" "s3_access" {
     bucket = aws_s3_bucket.bucket_s3.id
     provider = aws
     region = var.default_region
+    block_public_acls = true
+    block_public_policy = true
+    restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_versioning" "version_s3" {
